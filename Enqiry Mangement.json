@@ -1,0 +1,280 @@
+{
+  "name": "Enqiry Mangement",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Enquiry Form | Digital Mart Lab",
+        "formDescription": "Get a digital marketing quote in 24 hour.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name"
+            },
+            {
+              "fieldLabel": "Mobile No.",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Email id",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Choose Services",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Website Desing"
+                  },
+                  {
+                    "option": "SEO Services"
+                  },
+                  {
+                    "option": "Social Media  Marketing "
+                  },
+                  {
+                    "option": "Performance Marketing"
+                  },
+                  {
+                    "option": "AI Marketing"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "326d61d8-79e7-46c8-8560-122621e8a308",
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -336,
+        16
+      ],
+      "webhookId": "9d8bbc6d-4476-4e49-bed1-22b996f852f3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "122z532UnV1E7xBRChdldRD2_KwNolZ3wY82nMwnZAl0",
+          "mode": "list",
+          "cachedResultName": "Digital Marketing Enquiry Data Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/122z532UnV1E7xBRChdldRD2_KwNolZ3wY82nMwnZAl0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/122z532UnV1E7xBRChdldRD2_KwNolZ3wY82nMwnZAl0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json['Full Name'] }}",
+            "Mobile No.": "={{ $json['Mobile No.'] }}",
+            "Email id": "={{ $json['Email id'] }}",
+            "Services": "={{ Array.isArray($json['Choose Services']) ? $json['Choose Services'].join(', ') : $json['Choose Services'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mobile No.",
+              "displayName": "Mobile No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email id",
+              "displayName": "Email id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Services",
+              "displayName": "Services",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "68446723-880e-4350-bac8-049c494b7f84",
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        16
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aazGX6N7y3ZeeNpQ",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email id'] }}",
+        "subject": "Thank You For the Enquiry ",
+        "emailType": "text",
+        "message": "=Dear {{ $json.Name }},\n\nThank You For The {{ $json.Services }} Enquiry,Our team will get back to you in 24 hours.\n\nThank you,\nDEV PATIL",
+        "options": {}
+      },
+      "id": "bdad4ec1-7815-4b13-afda-63cfd5b4af17",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        16
+      ],
+      "webhookId": "77a0a55c-3eff-4fef-bf9f-21239e4f17a0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HHg4UxOhelsUKQoq",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "givenName": "={{ $('Append row in sheet').item.json.Name }}",
+        "additionalFields": {
+          "phoneUi": {
+            "phoneValues": [
+              {
+                "type": "mobile",
+                "value": "=91{{ $('Append row in sheet').item.json['Mobile No.'] }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "2a9e77fe-5967-4616-89c3-b7c3a4466354",
+      "name": "Create a contact",
+      "type": "n8n-nodes-base.googleContacts",
+      "typeVersion": 1,
+      "position": [
+        336,
+        16
+      ],
+      "credentials": {
+        "googleContactsOAuth2Api": {
+          "id": "FGxnEnf32NyMZIuP",
+          "name": "Google Contacts account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "devpatil4232@gmail.com",
+        "subject": "new digital marketing enquiry",
+        "emailType": "text",
+        "message": "=Dear team,\n\nWe recevied new digital marketing enquiry-\nName- {{ $('Append row in sheet').item.json.Name }}\nEmail id- {{ $('Append row in sheet').item.json['Email id'] }}\nContact no.- {{ $('Append row in sheet').item.json['Mobile No.'] }}\nServices- {{ $('Append row in sheet').item.json.Services }}\n\n\nThank you",
+        "options": {}
+      },
+      "id": "d35f8253-752c-466e-90df-d91b42f5175f",
+      "name": "Send a message1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        16
+      ],
+      "webhookId": "79ef3011-030a-4bf6-b287-61458ee7f1fa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GdRvC0xt3QaTTYLx",
+          "name": "Gmail account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Create a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a contact": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "68f5cba1-c30f-41c8-9b5b-ff19b77c7bc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "129993043dc3af35d91cc9cb015e5b05cdcffc970126518b15246f0496bbff6f"
+  },
+  "nodeGroups": [],
+  "id": "BwbkEODzNzZk6iZ1",
+  "tags": []
+}
